@@ -8,7 +8,7 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 
 
-const ModeToogle = () => {
+const ModeToggle = () => {
     const [mounted, setMounted] = useState(false);
     const { theme, setTheme } = useTheme();
 
@@ -62,4 +62,4 @@ const ModeToogle = () => {
     );
 };
 
-export default ModeToogle;
+export default ModeToggle;
