@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ProductCard from "@/components/shared/product/product-card";
 
 const ProductList = ({ data, title, limit, }: { data: any, title?: string, limit?: number}) => {
     const limitedData = limit ? data.slice(0, limit) : data;
@@ -8,10 +9,10 @@ const ProductList = ({ data, title, limit, }: { data: any, title?: string, limit
             <h2 className='h2-bold mb-4'>
                 {title}
             </h2>
-            {limitedData.length > 0 ? (
+            {data.length > 0 ? (
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                     {limitedData.map((product: any) => (
-                        <>{product.name}</>
+                        <ProductCard key={product.slug} product={product} />
                     ))}
                 </div>
             ) : (
