@@ -18,3 +18,8 @@ export const insertProductSchema = z.object({
     banner: z.string().nullable(),
     price: currency,
 })
+
+export const signInFormSchema = z.object({
+    email: z.string().email('Email invalido').min(3, 'Email deve ter pelo menos 3 caracteres'),
+    password: z.string().min(3, 'Password deve ter pelo menos 3 caracteres'),
+})
