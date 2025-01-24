@@ -1,7 +1,7 @@
 import {neonConfig, Pool} from "@neondatabase/serverless";
-import ws from "ws";
 import {PrismaNeon} from "@prisma/adapter-neon";
 import {PrismaClient} from "@prisma/client";
+import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
 const connectionString = `${process.env.DATABASE_URL}`;
@@ -9,8 +9,7 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaNeon(pool);
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
+
 export const prisma = new PrismaClient({ adapter }).$extends({
     result: {
         product: {
