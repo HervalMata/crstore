@@ -1,3 +1,5 @@
+"use client";
+
 import {Label} from "@/components/ui/label";
 import {signInDefaultValues} from "@/lib/constants";
 import {Button} from "@/components/ui/button";
@@ -12,6 +14,9 @@ const CredentialsSignInForm = () => {
         success: false,
     });
 
+    const searchParams = new URLSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || '/';
+
     const SignInButton = () => {
         const { pending } = useFormStatus();
 
@@ -24,10 +29,9 @@ const CredentialsSignInForm = () => {
         )
     }
 
-
-    // @ts-ignore
     return (
         <form action={action}>
+            <input type='hidden' name='callbackUrl' value={callbackUrl} />
             <div className='space-y-6'>
                 <div>
                     <Label htmlFor={'email'}>Email</Label>
