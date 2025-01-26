@@ -2,8 +2,9 @@ import * as React from 'react';
 import ModeToggle from "@/components/shared/header/mode-toggle";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
-import {EllipsisVertical, ShoppingCart, UserIcon} from "lucide-react";
-import {Sheet, SheetContent, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
+import {EllipsisVertical, ShoppingCart} from "lucide-react";
+import {Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
+import UserButton from "@/components/shared/header/user-button";
 
 
 const Menu = () => {
@@ -18,12 +19,7 @@ const Menu = () => {
                             Carrinho
                         </Link>
                     </Button>
-                    <Button asChild>
-                        <Link href='/sign-in'>
-                            <UserIcon />
-                            Entrar
-                        </Link>
-                    </Button>
+                    <UserButton />
                 </nav>
                     <nav className='md:hidden'>
                         <Sheet>
@@ -39,12 +35,8 @@ const Menu = () => {
                                         Carrinho
                                     </Link>
                                 </Button>
-                                <Button asChild>
-                                    <Link href='/sign-in'>
-                                        <UserIcon />
-                                        Entrar
-                                    </Link>
-                                </Button>
+                                <UserButton />
+                                <SheetDescription></SheetDescription>
                             </SheetContent>
                         </Sheet>
                     </nav>
