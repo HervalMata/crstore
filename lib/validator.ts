@@ -41,7 +41,7 @@ export const cartItemSchema = z.object({
     name: z.string().min(1, 'Nome é requerido'),
     slug: z.string().min(1, 'Slug é requerido'),
     qty: z.number().int().nonnegative('Quantidade deve ser um número positivo'),
-    images: z.string().min(1, 'Imagem é requerida'),
+    image: z.string().min(1, 'Imagem é requerida'),
     price: currency,
 });
 
