@@ -35,3 +35,22 @@ export const signUpFormSchema = z.object({
         path: ['confirmPassword'],
     }
 );
+
+export const cartItemSchema = z.object({
+    productId: z.string().min(1, 'Produto é requerido'),
+    name: z.string().min(1, 'Nome é requerido'),
+    slug: z.string().min(1, 'Slug é requerido'),
+    qty: z.number().int().nonnegative('Quantidade deve ser um número positivo'),
+    images: z.string().min(1, 'Imagem é requerida'),
+    price: currency,
+});
+
+export const insertCartSchema = z.object({
+    items: z.array(cartItemSchema),
+    itemsPrice: currency,
+    totalPrice: currency,
+    shippingPrice: currency,
+    taxPrice: currency,
+    sessionCartId: z.string().min(1, 'ID da Sessão do carrinho é requerida.'),
+    userId: z.string().optional().nullable(),
+})
