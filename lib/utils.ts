@@ -30,3 +30,13 @@ export function formatError(error: any) : string {
     return typeof error.message === 'string' ? error.message : JSON.stringify(error.message);
   }
 }
+
+export function round2(value: number | string) {
+   if (typeof value === 'number') {
+     return Math.round((value + Number.EPSILON) * 100) /100;
+   } else if (typeof value === 'string') {
+     return Math.round((Number(value) - Number.EPSILON) * 100) / 1000;
+   } else {
+     throw new Error('O valor não é um número ou uma string')
+   }
+}
