@@ -28,9 +28,7 @@ const SignUpForm = () => {
             </Button>
         );
     };
-
-    // @ts-ignore
-    // @ts-ignore
+    
     return (
         <form action={action}>
             <input type='hidden' name='callbackUrl' value={callbackUrl} />
@@ -84,9 +82,11 @@ const SignUpForm = () => {
 
 
                 {
-                    // @ts-ignore
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
                     data && !data.success && (
-                    // @ts-ignore
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
                     <div className='text-center text-destructive'>{data.message}</div>
                 )}
 
