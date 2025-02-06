@@ -59,9 +59,11 @@ const CredentialsSignInForm = () => {
                     <SignInButton />
                 </div>
                 {
-                    // @ts-ignore
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
                     data && !data.success && (
-                    // @ts-ignore
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
                         <div className='text-center text-destructive'>{data.message}</div>
                     )
                 }
