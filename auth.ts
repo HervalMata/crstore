@@ -5,7 +5,6 @@ import {prisma} from "@/db/prisma";
 import CredentialsProvider from 'next-auth/providers/credentials'
 import {compareSync} from "bcrypt-ts-edge";
 import {NextResponse} from "next/server";
-import { cookies } from "next/headers";
 
 export const config = {
     pages: {
@@ -54,7 +53,9 @@ export const config = {
         })
     ],
     callbacks: {
-        async session({ session, user, trigger, token } : any) {
+        async session({ session, user, trigger, token } :
+                      any
+        ) {
             session.user.id = token.sub;
             session.user.role = token.role;
             session.user.name = token.name;
@@ -66,6 +67,7 @@ export const config = {
             return session;
         },
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async jwt({ token, user, trigger, session } : any) {
             if (user) {
                 token.r9ole = user.role;
@@ -82,6 +84,7 @@ export const config = {
             return token;
         },
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         authorized({ request, auth }: any){
             if (!request.cookies.get('sessionCartId')) {
                 const sessionCartId = crypto.randomUUID();

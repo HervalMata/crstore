@@ -46,17 +46,18 @@ export async function addItemToCart(data: CartItem) {
                 sessionCartId: sessionCartId,
                 ...calcPrice([item]),
             });
-
+            
             await prisma.cart.create({
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 data: newCart,
             });
 
-            revalidatePath(`/products/${product.slug}`);
+            revalidatePath(`/product/${product.slug}`);
 
             return {
                 success: true,
-                message: `Itens Adicionados para o carrinho`,
+                message: `${product.name} adicionado para o carrinho`,
             };
         } else {
             const existItem = (cart.items as CartItem[]).find(
@@ -121,4 +122,45 @@ export async function getMyCart() {
          shippingPrice: cart.shippingPrice.toString(),
          taxRate: cart.taxPrice.toString(),
      });
+}
+
+export async function removeItemFromCart(productId: string) {
+    try {
+        const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+        if (!sessionCartId) throw new Error('Carrinho não encontrado.');
+
+        const product = await prisma.product.findFirst({
+            where: { id: productId },
+        });
+        if (!product) throw new Error('Produto não encontrado.');
+
+        const cart = await getMyCart();
+        if (!cart) throw new Error('Carrinho não encontrado.');
+
+        const exist = (cart.items as CartItem[]).find((x) => x.productId === productId);
+        if (!exist) throw new Error('Item não encontrado.');
+
+        if (exist.qty === 1) {
+            cart.items = (cart.items as CartItem[]).filter((x) => x.productId === productId);
+        } else {
+            (cart.items as CartItem[]).find((x) => x.productId === productId)!.qty = exist.qty -1
+        }
+
+        await prisma.cart.update({
+            where: { id: cart.id },
+            data: {
+                items: cart.items as Prisma.CartUpdateitemsInput[],
+                ...calcPrice(cart.items as CartItem[]),
+            },
+        });
+
+        revalidatePath(`/product/${product.slug}`);
+
+        return {
+            success: true,
+            message: `${product.name} foi removido do carrinho`,
+        };
+    } catch (error) {
+        return { success: false, message: formatError(error) };
+    }
 }
