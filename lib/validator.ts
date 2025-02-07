@@ -2,7 +2,8 @@ import {z} from "zod";
 import {formatNumberWithDecimal} from "@/lib/utils";
 
 const currency = z.string().refine(
-    (value) => /^\d+(\.\d{2})?R$/.test(formatNumberWithDecimal(Number(value))),
+    (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+    //(value) => /^\d{1,3}(?:\.\d{3})*,\d{2}$/.test(formatNumberWithDecimal(Number(value))),
     'Preço deve ter exatamente 2 decimais'
 )
 
@@ -53,4 +54,15 @@ export const insertCartSchema = z.object({
     taxPrice: currency,
     sessionCartId: z.string().min(1, 'ID da Sessão do carrinho é requerida.'),
     userId: z.string().optional().nullable(),
+});
+
+export const shippingAddress = z.object({
+    fullName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
+    streetAddress: z.string().min(3, 'Endereço deve ter pelo menos 3 caracteres'),
+    city: z.string().min(3, 'Cidade deve ter pelo menos 3 caracteres'),
+    state: z.string().min(2, 'Estado deve ter pelo menos 2 caracteres'),
+    postalCode: z.string().min(8, 'CEP deve ter pelo menos 8 caracteres'),
+    country: z.string().min(3, 'País deve ter pelo menos 3 caracteres'),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
 })

@@ -68,3 +68,13 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
         return { success: false, message: formatError(error) };
     }
 }
+
+export async function getUserById(userId: string) {
+    const user = await prisma.user.findFirst({
+        where: { id: userId },
+    });
+
+    if (!user) throw new Error(`Usuário com ID ${userId} não encontrado.`);
+
+    return user;
+}

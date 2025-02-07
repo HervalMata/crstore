@@ -16,7 +16,7 @@ const calcPrice = (items: CartItem[]) => {
     shippingPrice = round2(itemPrice > 100 ? 0 : 10),
     taxPrice = round2(0.15 * itemPrice),
     totalPrice =round2(itemPrice + taxPrice + shippingPrice);
-
+    console.log(itemPrice, shippingPrice, taxPrice, totalPrice);
     return {
         itemPrice: itemPrice.toFixed(2),
         shippingPrice: shippingPrice.toFixed(2),
@@ -28,31 +28,41 @@ const calcPrice = (items: CartItem[]) => {
 export async function addItemToCart(data: CartItem) {
     try {
         const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+        console.log(sessionCartId);
         if (!sessionCartId) throw new Error('Carrinho não encontrado.');
 
         const session = await auth();
+        console.log(session);
         const userId = session?.user?.id ? (session.user.id as string) : undefined;
+        console.log(userId);
         const cart = await getMyCart();
         const item = cartItemSchema.parse(data);
+        console.log("Item: ", item);
         const product = await prisma.product.findFirst({
             where: {id: item.productId},
         });
+        console.log("Product: ", product);
         if (!product) throw new Error('Produto não encontrado.');
-
+        console.log("1: ", cart);
         if (!cart) {
             const newCart = insertCartSchema.parse({
                 userId: userId,
                 items: [item],
                 sessionCartId: sessionCartId,
-                ...calcPrice([item]),
+                //...calcPrice([item]),
+                itemPrice: calcPrice([item]).itemPrice,
+                shippingPrice: calcPrice([item]).shippingPrice,
+                taxPrice: calcPrice([item]).taxPrice,
+                totalPrice: calcPrice([item]).totalPrice,
             });
-            
+            console.log("NewCart: ", newCart, "userId: " + userId, "Items: " , [item]);
             await prisma.cart.create({
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 data: newCart,
-            });
 
+            });
+            console.log("Data: ", data)
             revalidatePath(`/product/${product.slug}`);
 
             return {
@@ -104,15 +114,17 @@ export async function addItemToCart(data: CartItem) {
 
 export async function getMyCart() {
      const sessionCartId = (await cookies()).get('sessionCartId')?.value;
-     if (!sessionCartId) throw new Error('Carrinho n-ao encontrado.');
+     if (!sessionCartId) throw new Error('Carrinho não encontrado.');
 
      const session = await auth();
+     console.log(session);
      const userId = session?.user?.id ? (session.user.id as string) : undefined;
+     console.log(userId);
      const cart = await prisma.cart.findFirst({
          where: userId ? { userId: userId } : { sessionCartId: sessionCartId },
      });
-
-     if (!cart) return undefined;
+     console.log("Cart:", cart);
+     if (!cart) return null;
 
      return convertToPlainObject({
          ...cart,

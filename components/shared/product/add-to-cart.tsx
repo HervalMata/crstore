@@ -17,11 +17,11 @@ const AddToCart = ({ cart, item }: { cart?: Cart, item: CartItem }) => {
     const handleAddToCart = async () => {
         startTransition(async () => {
             const res = await addItemToCart(item);
-
+            console.log(res)
             if (!res.success) {
                 toast({
                     variant: 'destructive',
-                    description: res.message,
+                    description: res.message.toString(),
                 });
                 return;
             }
