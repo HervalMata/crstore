@@ -12,7 +12,7 @@ export const signUpDefaultValues = {
     password: '',
     confirmPassword: '',
 };
-export const shippingAddress = {
+export const shippingAddressDefaultValues = {
     fullName: 'John Doe',
     streetAddress: '123 Main st',
     city: 'Teresópolis',
