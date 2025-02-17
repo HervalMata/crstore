@@ -44,22 +44,36 @@ export async function addItemToCart(data: CartItem) {
         console.log("Product: ", product);
         if (!product) throw new Error('Produto não encontrado.');
         console.log("1: ", cart);
+        console.log("2: ", item);
+        console.log("ProductId: ", product.id,
+            "Name: ", product.name,
+            "Slug: ", product.slug,
+            "Image: ", product.images[0],
+            "Price: ", product.price);
         if (!cart) {
-            const newCart = insertCartSchema.parse({
+            /*const newCart = insertCartSchema.parse({
                 userId: userId,
                 items: [item],
                 sessionCartId: sessionCartId,
-                //...calcPrice([item]),
-                itemPrice: calcPrice([item]).itemPrice,
+                ...calcPrice([item]),
+                /!*itemPrice: calcPrice([item]).itemPrice,
                 shippingPrice: calcPrice([item]).shippingPrice,
                 taxPrice: calcPrice([item]).taxPrice,
-                totalPrice: calcPrice([item]).totalPrice,
-            });
-            console.log("NewCart: ", newCart, "userId: " + userId, "Items: " , [item]);
+                totalPrice: calcPrice([item]).totalPrice,*!/
+            });*/
+            console.log("itemPrice: " ,calcPrice.toString());
+            //console.log("NewCart: ", newCart, "userId: " + userId, "Items: " , [item]);
+
             await prisma.cart.create({
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                data: newCart,
+                data: ({
+                    userId: userId,
+                    items: [item],
+                    sessionCartId: sessionCartId,
+                    itemsPrice: calcPrice([item]).itemPrice,
+                    shippingPrice: calcPrice([item]).shippingPrice,
+                    taxPrice: calcPrice([item]).taxPrice,
+                    totalPrice: calcPrice([item]).totalPrice,
+                }),
 
             });
             console.log("Data: ", data)
