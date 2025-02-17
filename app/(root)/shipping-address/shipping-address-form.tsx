@@ -1,7 +1,9 @@
+'use client';
+
 import {ShippingAddress} from "@/types";
 import {useRouter} from "next/navigation";
 import {useToast} from "@/hooks/use-toast";
-import {ControllerRenderProps, useForm} from "react-hook-form";
+import {ControllerRenderProps, SubmitHandler, useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useTransition} from "react";
@@ -11,23 +13,36 @@ import {Button} from "@/components/ui/button";
 import {ArrowRight, Loader} from "lucide-react";
 import {shippingAddressDefaultValues} from "@/lib/constants";
 import {shippingAddressSchema} from "@/lib/validator";
+import {updateUserAddress} from "@/lib/actions/user.actions";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const router = useRouter();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof shippingAddressSchema>>({
        resolver: zodResolver(shippingAddressSchema),
-       defaultValues: address || shippingAddressDefaultValues,
+       defaultValues: address,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isPending, startTransition] = useTransition();
 
-    const onSubmit = () => {
-        return;
+    const onSubmit: SubmitHandler<z.infer<typeof shippingAddressSchema>> = (values) => {
+        startTransition(async () => {
+            const res = await updateUserAddress(values);
+
+            if (!res.success) {
+                toast({
+                    variant: 'destructive',
+                    description: res.message,
+                });
+                return;
+            }
+
+            router.push("/payment-method");
+        });
     };
 
     return (
@@ -41,7 +56,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
                 </p>
                 <Form {...form}>
                     <form
-                        method='POST'
+                        method='post'
                         className='space-y-4'
                         onSubmit={form.handleSubmit(onSubmit)}
                     >
@@ -166,7 +181,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
                         </div>
 
                         <div className='flex gap-2'>
-                            <Button type='button' disabled={isPending}>
+                            <Button type='submit' disabled={isPending}>
                                 {isPending ? (
                                     <Loader className='h-4 w-4 animate-spin' />
                                 ) : (
