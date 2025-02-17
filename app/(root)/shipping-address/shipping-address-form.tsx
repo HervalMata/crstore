@@ -11,7 +11,6 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {ArrowRight, Loader} from "lucide-react";
-import {shippingAddressDefaultValues} from "@/lib/constants";
 import {shippingAddressSchema} from "@/lib/validator";
 import {updateUserAddress} from "@/lib/actions/user.actions";
 
