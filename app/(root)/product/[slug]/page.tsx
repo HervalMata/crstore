@@ -64,8 +64,6 @@ const ProductDetailsPage = async (props: {
                                 {product.stock > 0 && (
                                     <div className='flex-center'>
                                         <AddToCart
-                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                            // @ts-expect-error
                                             cart={cart}
                                             item={{
                                                 productId: product.id,

@@ -112,8 +112,6 @@ const PlaceOrderPage = async () => {
                                 <div>
                                     {
                                         formatCurrency
-                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                        // @ts-expect-error
                                             (cart.taxPrice)
                                     }
                                 </div>

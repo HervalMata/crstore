@@ -29,42 +29,31 @@ const calcPrice = (items: CartItem[]) => {
 export async function addItemToCart(data: CartItem) {
     try {
         const sessionCartId = (await cookies()).get('sessionCartId')?.value;
-        console.log(sessionCartId);
+        
         if (!sessionCartId) throw new Error('Carrinho não encontrado.');
 
         const session = await auth();
-        console.log(session);
+        
         const userId = session?.user?.id ? (session.user.id as string) : undefined;
-        console.log(userId);
+        
         const cart = await getMyCart();
         const item = cartItemSchema.parse(data);
-        console.log("Item: ", item);
+        
         const product = await prisma.product.findFirst({
             where: {id: item.productId},
         });
-        console.log("Product: ", product);
+        
         if (!product) throw new Error('Produto não encontrado.');
-        console.log("1: ", cart);
-        console.log("2: ", item);
-        console.log("ProductId: ", product.id,
-            "Name: ", product.name,
-            "Slug: ", product.slug,
-            "Image: ", product.images[0],
-            "Price: ", product.price);
+
         if (!cart) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             /*const newCart = insertCartSchema.parse({
                 userId: userId,
                 items: [item],
                 sessionCartId: sessionCartId,
                 ...calcPrice([item]),
-                /!*itemPrice: calcPrice([item]).itemPrice,
-                shippingPrice: calcPrice([item]).shippingPrice,
-                taxPrice: calcPrice([item]).taxPrice,
-                totalPrice: calcPrice([item]).totalPrice,*!/
             });*/
-            console.log("itemPrice: " ,calcPrice.toString());
-            //console.log("NewCart: ", newCart, "userId: " + userId, "Items: " , [item]);
-
+            
             await prisma.cart.create({
                 data: ({
                     userId: userId,
@@ -75,9 +64,10 @@ export async function addItemToCart(data: CartItem) {
                     taxPrice: calcPrice([item]).taxPrice,
                     totalPrice: calcPrice([item]).totalPrice,
                 }),
-
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //// @ts-expect-error
+                //data: newCart,
             });
-            console.log("Data: ", data)
             revalidatePath(`/product/${product.slug}`);
 
             return {
