@@ -5,6 +5,7 @@ import {cookies} from "next/headers";
 import {auth} from "@/auth";
 import {prisma} from "@/db/prisma";
 import {convertToPlainObject, formatError, round2} from "@/lib/utils";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {cartItemSchema, insertCartSchema} from "@/lib/validator";
 import {revalidatePath} from "next/cache";
 import {Prisma} from "@prisma/client";
