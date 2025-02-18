@@ -2,7 +2,6 @@ const base = process.env.PAYPAL_BASE_URL || 'https://api-m.sandbox.paypal.com';
 
 export const paypal = {};
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function generateAccessToken() {
     const {
         PAYPAL_CLIENT_ID,
@@ -28,4 +27,6 @@ async function generateAccessToken() {
         throw new Error(errorMessage);
     }
 }
+
+export { generateAccessToken}
 
