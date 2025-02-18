@@ -1,5 +1,6 @@
 import {Metadata} from "next";
 import {getOrderById} from "@/lib/actions/order.actions";
+import notFound from "@/app/not-found";
 
 export const metadata: Metadata = {
     title: "Detalhes da Ordem",
@@ -13,8 +14,9 @@ const OrderDetailsPage = async (
     }
 ) => {
   const { id } = await props.params;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const order = await getOrderById(id);
+  if (!order) notFound();
 
   return <>Detalhes da Ordem</>
 }
