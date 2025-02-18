@@ -56,3 +56,52 @@ export function formatCurrency(amount: number | string | null) {
     return 'NaN';
   }
 }
+
+export function formatId(id: string) {
+  return `..${id.substring(id.length - 6)}`;
+}
+
+export const formatDateTime = (dateString: Date) => {
+  const dateTimeOptions: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    year: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  };
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    weekday: 'short',
+    month: 'short',
+    year: 'numeric',
+    day: 'numeric',
+  };
+
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  };
+
+  const formattedDateTime: string = new Date(dateString).toLocaleDateString(
+      'pt-BR',
+      dateTimeOptions,
+  );
+
+  const formattedDate: string = new Date(dateString).toLocaleDateString(
+      'pt-BR',
+      dateOptions,
+  );
+
+  const formattedTime: string = new Date(dateString).toLocaleTimeString(
+      'pt-BR',
+      timeOptions,
+  );
+
+  return {
+    dateTime: formattedDateTime,
+    dateOnly: formattedDate,
+    timeOnly: formattedTime,
+  };
+};
