@@ -7,8 +7,9 @@ import {getMyCart} from "@/lib/actions/cart.actions";
 import {getUserById} from "@/lib/actions/user.actions";
 import {insertOrderSchema} from "@/lib/validator";
 import {prisma} from "@/db/prisma";
-import {CartItem} from "@/types";
+import {CartItem, PaymentResult} from "@/types";
 import {paypal} from "@/lib/paypal";
+import {revalidatePath} from "next/cache";
 
 export const createOrder = async () => {
     try {
@@ -153,4 +154,89 @@ export async function createPaypalOrder(orderId: string) {
     } catch (error) {
         return { success: false, message: formatError(error) };
     }
+}
+
+export async function approvePaypalOrder(
+    orderId: string,
+    data: { OrderId: string },
+) {
+    try {
+        const order = await prisma.order.findFirst({
+            where: { id: orderId },
+        });
+
+        const captureData = await paypal.capturePayment(data.OrderId);
+
+        if (
+            !captureData ||
+            captureData.id !== (order?.paymentResult as PaymentResult)?.id ||
+            captureData.status !== "COMPLETED"
+        ) {
+            throw new Error('Erro ao processar pagamento pelo paypal.');
+        }
+
+        await updateOrderToPaid({
+            orderId,
+            paymentResult: {
+                id: captureData.id,
+                email_address: captureData.payer.email_address,
+                status: captureData.status,
+                pricePaid: captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+            },
+        });
+
+        revalidatePath(`/order/${orderId}`);
+
+        return {
+            success: true,
+            message: 'Sua Ordem Paypal foi paga com sucesso.',
+        };
+    } catch (error) {
+        return { success: false, message: formatError(error) };
+    }
+}
+
+export async function updateOrderToPaid({
+    orderId,
+    paymentResult,
+} : {
+    orderId: string;
+    paymentResult?: PaymentResult;
+}) {
+    const order = await prisma.order.findFirst({
+        where: { id: orderId },
+        include: {
+            orderItems: true,
+        },
+    });
+
+    if (!order) new Error(`Ordem não encontrada.`);
+
+    if (order.isPaid) throw new Error('Ordem já foi paga.');
+
+    await prisma.$transaction(async (tx) => {
+        for (const item of order.orderItems) {
+            await tx.product.update({
+                where: {
+                    id: item.productId,
+                },
+                data: {
+                    stock: {
+                        increment: -item.qty,
+                    },
+                },
+            });
+        }
+
+        await tx.order.update({
+            where: {
+                id: order.id,
+            },
+            data: {
+                isPaid: true,
+                paidAt: new Date(),
+                paymentResult,
+            },
+        });
+    });
 }
