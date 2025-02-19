@@ -128,7 +128,7 @@ export async function createPaypalOrder(orderId: string) {
             where: { id: orderId },
         });
 
-        if (!order) {
+        if (order) {
             const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
 
             await prisma.order.update({
@@ -145,7 +145,7 @@ export async function createPaypalOrder(orderId: string) {
 
             return {
                 success: true,
-                message: 'Ordem Paypal Criada com sucesso.',
+                message: 'Item da Ordem Paypal Criada com sucesso.',
                 data: paypalOrder.id,
             };
         } else {
@@ -164,6 +164,8 @@ export async function approvePaypalOrder(
         const order = await prisma.order.findFirst({
             where: { id: orderId },
         });
+
+        if (!order) new Error(`Ordem não encontrada.`);
 
         const captureData = await paypal.capturePayment(data.OrderId);
 
@@ -196,7 +198,7 @@ export async function approvePaypalOrder(
     }
 }
 
-export async function updateOrderToPaid({
+async function updateOrderToPaid({
     orderId,
     paymentResult,
 } : {
@@ -239,4 +241,18 @@ export async function updateOrderToPaid({
             },
         });
     });
+
+    const updatedOrder = await prisma.order.findFirst({
+        where: {
+            id: orderId,
+        },
+        include: {
+            orderItems: true,
+            user: { select: { name: true, email: true } },
+        },
+    });
+
+    if (!updatedOrder) {
+        throw new Error('Ordem não encontrada.');
+    }
 }

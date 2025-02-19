@@ -8,13 +8,54 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import Image from "next/image";
 import PlaceOrderForm from "@/app/(root)/place-order/place-order-form";
 import {Badge} from "@/components/ui/badge";
+import {useToast} from "@/hooks/use-toast";
+import {PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer} from "@paypal/react-paypal-js";
+import {approvePaypalOrder, createPaypalOrder} from "@/lib/actions/order.actions";
 
-const OrderDetailsTable = ({ order }: { order: Order }) => {
+const OrderDetailsTable = ({ order, paypalClientId }: { order: Order; paypalClientId: string }) => {
   const {
       id, shippingAddress, orderItems, itemsPrice, shippingPrice,
       taxPrice, totalPrice, paymentMethod, isDelivered, isPaid,
       paidAt, deliveredAt,
   } = order;
+  
+  const { toast } = useToast();
+  
+  const PrintLoadingState = () => {
+    const [{ isPending, isRejected}] = usePayPalScriptReducer();
+    let status = '';
+    
+    if (isPending) {
+        status = 'Processando Paypal...';
+    } else if (isRejected) {
+        status = 'Erro ao processar paypal.';
+    }
+    return status;
+  }
+  
+  const handleCreatePayPalOrder = async () => {
+    const res = await createPaypalOrder(order.id);
+    
+    if (!res.success) {
+        toast({
+            variant: "destructive",
+            description: res.message,
+        });
+    }
+    return res.data;
+  }
+
+    const handleApprovePayPalOrder = async (data: { orderID: string}) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        const res = await approvePaypalOrder(order.id, data);
+        
+        toast({
+            variant: res.success ? 'default' : "destructive",
+            description: res.message,
+        });
+        
+    }
 
   return (
       <>
@@ -110,6 +151,17 @@ const OrderDetailsTable = ({ order }: { order: Order }) => {
                               <div>Total</div>
                               <div>{formatCurrency(totalPrice)}</div>
                           </div>
+                          {!isPaid && paymentMethod === 'PayPal' && (
+                              <div>
+                                  <PayPalScriptProvider options={{ clientId: paypalClientId}}>
+                                      <PrintLoadingState />
+                                      <PayPalButtons
+                                        createOrder={handleCreatePayPalOrder}
+                                        onApprove={handleApprovePayPalOrder}
+                                      />
+                                  </PayPalScriptProvider>
+                              </div>
+                          )}
                           <PlaceOrderForm />
                       </CardContent>
                   </Card>
