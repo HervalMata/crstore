@@ -11,6 +11,7 @@ import {CartItem, PaymentResult} from "@/types";
 import {paypal} from "@/lib/paypal";
 import {revalidatePath} from "next/cache";
 import {PAGE_SIZE} from "@/lib/constants";
+import {Prisma} from "@prisma/client";
 
 export const createOrder = async () => {
     try {
@@ -288,7 +289,7 @@ export async function getMyOrders({
 type salesDataType = {
     month: string;
     totalSales: number;
-}
+}[];
 
 export async function getOrderSummary() {
     const ordersCount = await prisma.order.count();
@@ -299,10 +300,15 @@ export async function getOrderSummary() {
         _sum: { totalPrice: true },
     });
 
-    const salesData = await prisma.$queryRaw`SELECT to_char("createdAt", "MM/YY") as "month",
+    const salesDataRaw = await prisma.$queryRaw<Array<{ month: string; totalSales: Prisma.Decimal }>>`SELECT to_char("createdAt", "MM/YY") as "month",
         sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", "MM/YY")`;
 
-    const latestOrders = await prisma.order.findMany({
+    const salesData: salesDataType = salesDataRaw.map((entry) => ({
+        month: entry.month,
+        totalSales: Number(entry.totalSales),
+    }));
+
+    const latestSales = await prisma.order.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
             user: { select: { name: true } },
@@ -315,8 +321,30 @@ export async function getOrderSummary() {
         productsCount,
         usersCount,
         totalSales,
-        latestOrders,
+        latestSales,
         salesData: convertToPlainObject(salesData) as salesDataType,
     };
 
+}
+
+export async function getAllOrders({
+    limit = PAGE_SIZE,
+    page,
+} : {
+    limit?: number;
+    page: number;
+}) {
+    const data = await prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: (page - 1) * limit,
+        include: { user: { select: { name: true } } },
+    });
+
+    const dataCount = await prisma.order.count();
+
+    return {
+        data,
+        totalPages: Math.ceil(dataCount/limit),
+    };
 }

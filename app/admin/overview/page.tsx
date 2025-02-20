@@ -85,11 +85,9 @@ const AdminOverviewPage = async () => {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className='pl-2'>
+                            <div>
                                 <Charts
                                     data={{
-                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                        // @ts-expect-error
                                         salesData: summary.salesData,
                                     }}
                                 />
@@ -111,9 +109,9 @@ const AdminOverviewPage = async () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {summary.latestOrders.map(order => (
+                                    {summary.latestSales.map(order => (
                                         <TableRow key={order.id}>
-                                            <TableCell>{order?.user?.name}</TableCell>
+                                            <TableCell>{order?.user?.name ? order?.user?.name : 'Usuário Removido'}</TableCell>
                                             <TableCell>{formatDateTime(order.createdAt).dateOnly}</TableCell>
                                             <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
                                             <TableCell>
