@@ -1,10 +1,12 @@
 import {Metadata} from "next";
-import {getAllOrders} from "@/lib/actions/order.actions";
+import {deleteOrder, getAllOrders} from "@/lib/actions/order.actions";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {formatCurrency, formatDateTime, formatId} from "@/lib/utils";
 import Link from "next/link";
 import Pagination from "@/components/shared/pagination";
 import {auth} from "@/auth";
+import {Button} from "@/components/ui/button";
+import DeleteDialog from "@/components/shared/delete-dialog";
 
 export const metadata: Metadata = {
     title: "Ordens",
@@ -49,9 +51,12 @@ const AdminOrdersPage = async (props: {
                                 <TableCell>{order.isPaid && order.paidAt ? formatDateTime(order.paidAt).dateTime : 'A Pagar'}</TableCell>
                                 <TableCell>{order.isDelivered && order.deliveredAt ? formatDateTime(order.deliveredAt).dateTime : 'Não Entregue'}</TableCell>
                                 <TableCell>
-                                    <Link href={`/order/${order.id}`}>
-                                        <span className='px-2'>Detalhes</span>
-                                    </Link>
+                                    <Button asChild variant='outline' size='sm'>
+                                        <Link href={`/order/${order.id}`}>
+                                            Detalhes
+                                        </Link>
+                                    </Button>
+                                    <DeleteDialog id={order.id} action={deleteOrder} />
                                 </TableCell>
                             </TableRow>
                         ))}
