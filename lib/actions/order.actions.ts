@@ -363,3 +363,46 @@ export async function deleteOrder(id: string) {
         return { success: false, message: formatError(error) };
     }
 }
+
+export async function updateOrderToPaidCCOD(orderId: string) {
+    try {
+        await updateOrderToPaid({ orderId });
+
+        revalidatePath(`/order/${orderId}`);
+
+        return {
+            success: true,
+            message: 'Ordem marcada como paga.'
+        }
+    } catch (error) {
+        return { success: false, message: formatError(error) };
+    }
+}
+
+export async function deliverOrder(orderId: string) {
+    try {
+        const order = await prisma.order.findFirst({
+            where: { id: orderId },
+        });
+
+        if (!order) throw new Error('Ordem não encontrada.');
+        if (!order.isPaid) throw new Error('Ordem não foi paga ainda.');
+
+        await prisma.order.update({
+            where: { id: orderId },
+            data: {
+                isDelivered: true,
+                deliveredAt: new Date(),
+            },
+        });
+
+        revalidatePath(`/order/${orderId}`);
+
+        return {
+            success: true,
+            message: 'Ordem marcada como entregue.',
+        }
+    } catch (error) {
+        return { success: false, message: formatError(error) };
+    }
+}
