@@ -103,3 +103,8 @@ export const paymentResultSchema = z.object({
     email_address: z.string(),
     pricePaid: z.string(),
 });
+
+export const updateProfileSchema = z.object({
+    name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
+    email: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
+})
