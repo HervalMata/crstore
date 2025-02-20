@@ -3,17 +3,13 @@ import  type { NextAuthConfig} from "next-auth";
 import {PrismaAdapter} from "@auth/prisma-adapter";
 import {prisma} from "@/db/prisma";
 import CredentialsProvider from 'next-auth/providers/credentials'
-import {compareSync} from "bcrypt-ts-edge";
-import {NextResponse} from "next/server";
+import {compare} from "./lib/encrypt";
+import { authConfig } from "@/auth.config";
 
 export const config = {
     pages: {
         signIn: '/sign-in',
         error: '/sign-in',
-    },
-    session: {
-        strategy: 'jwt',
-        maxAge: 30 * 24 * 60 * 60,
     },
     adapter: PrismaAdapter(prisma),
     providers: [
@@ -34,7 +30,7 @@ export const config = {
                 })
 
                 if (user && user.password) {
-                    const isMatch = compareSync(
+                    const isMatch = compare(
                         credentials.password as string,
                         user.password,
                     )
@@ -52,77 +48,11 @@ export const config = {
             }
         })
     ],
-    callbacks: {
-        async session({ session, user, trigger, token } :
-                      any
-        ) {
-            session.user.id = token.sub;
-            session.user.role = token.role;
-            session.user.name = token.name;
+    ...authConfig.callbacks,
 
-            if (trigger === 'update') {
-                session.user.name = user.name;
-            }
+    session: {
+        strategy: 'jwt' as const,
 
-            return session;
-        },
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        async jwt({ token, user, trigger, session } : any) {
-            if (user) {
-                token.r9ole = user.role;
-
-                if (user.name === 'NO_NAME') {
-                    token.name = user.email.split('@')[0];
-
-                    await prisma.user.update({
-                        where: { id: user.id },
-                        data: { name: token.name },
-                    });
-                }
-            }
-
-            if (session?.user?.name && trigger === 'update') {
-                token.name = session.user.name;
-            }
-
-            return token;
-        },
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        authorized({ request, auth }: any){
-            const protectedPaths = [
-                /\/shipping-address/,
-                /\/payment-method/,
-                /\/place-order/,
-                /\/profile/,
-                /\/user\/(.*)/,
-                /\/order\/(.*)/,
-                /\/admin/,
-            ];
-
-            const { pathname } = request.nextUrl;
-
-            if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
-
-            if (!request.cookies.get('sessionCartId')) {
-                const sessionCartId = crypto.randomUUID();
-
-                const newRequestHeaders = new Headers(request.headers);
-
-                const response = NextResponse.next({
-                    request: {
-                        headers: newRequestHeaders,
-                    },
-                });
-
-                response.cookies.set('sessionCartId', sessionCartId);
-
-                return response;
-            } else {
-                return true;
-            }
-        },
     },
 } satisfies NextAuthConfig;
 

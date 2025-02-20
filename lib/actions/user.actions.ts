@@ -3,11 +3,12 @@
 import {paymentMethodSchema, shippingAddressSchema, signInFormSchema, signUpFormSchema} from "@/lib/validator";
 import {auth, signIn, signOut} from "@/auth";
 import {isRedirectError} from "next/dist/client/components/redirect-error";
-import {hashSync} from "bcrypt-ts-edge";
 import {prisma} from "@/db/prisma";
 import {formatError} from "@/lib/utils";
 import {ShippingAddress} from "@/types";
 import {z} from "zod";
+import {getMyCart} from "@/lib/actions/cart.actions";
+import { hash } from "../encrypt";
 
 export async function signInWithCredentials(
     prevState: unknown,
@@ -32,6 +33,15 @@ export async function signInWithCredentials(
 }
 
 export async function signOutUser() {
+    const currentCart = await getMyCart();
+
+    if (currentCart?.id) {
+        await prisma.cart.delete({
+            where: { id: currentCart.id },
+        });
+    } else {
+        console.warn('Nenhum carrinho encontrado para remoção.')
+    }
     await signOut();
 }
 
@@ -46,7 +56,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
         const plainPassword = user.password;
 
-        user.password = hashSync(user.password, 10);
+        user.password = await hash(user.password);
 
         await prisma.user.create({
             data: {

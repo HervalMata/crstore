@@ -1,8 +1,9 @@
 import {Metadata} from "next";
 import {getOrderById} from "@/lib/actions/order.actions";
-import notFound from "@/app/not-found";
 import OrderDetailsTable from "@/app/(root)/order/[id]/order-details-table";
 import {ShippingAddress} from "@/types";
+import {auth} from "@/auth";
+import {notFound,redirect} from "next/navigation";
 
 export const metadata: Metadata = {
     title: "Detalhes da Ordem",
@@ -19,6 +20,12 @@ const OrderDetailsPage = async (
 
   const order = await getOrderById(id);
   if (!order) notFound();
+
+  const session = await auth();
+
+  if (order.userId !== session?.user.id) {
+      return redirect('/unauthorized');
+  }
 
   return (
       <OrderDetailsTable order={{
