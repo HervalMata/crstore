@@ -13,12 +13,12 @@ export const signUpDefaultValues = {
     confirmPassword: '',
 };
 export const shippingAddressDefaultValues = {
-    fullName: 'John Doe',
-    streetAddress: '123 Main st',
-    city: 'Teresópolis',
-    state: 'RJ',
-    postalCode: '12345678',
-    country: 'Brasil',
+    fullName: '',
+    streetAddress: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
 };
 
 export const PAYMENT_METHODS =
@@ -29,3 +29,18 @@ export const PAYMENT_METHODS =
 export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'PayPal';
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
+
+export const productDefaultValues = {
+    name: '',
+    slug: '',
+    category: '',
+    image: [],
+    brand: '',
+    description: '',
+    price: '0',
+    stock: '0',
+    rating: '0',
+    numReviews: '0',
+    isFeatured: false,
+    banner: null,
+};

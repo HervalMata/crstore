@@ -21,6 +21,10 @@ export const insertProductSchema = z.object({
     price: currency,
 })
 
+export const updateProductSchema = z.object({
+    id: z.string().min(3, 'A ID é requerida.'),
+});
+
 export const signInFormSchema = z.object({
     email: z.string().email('Email invalido').min(3, 'Email deve ter pelo menos 3 caracteres'),
     password: z.string().min(3, 'Senha deve ter pelo menos 3 caracteres'),

@@ -13,6 +13,7 @@ import {Button} from "@/components/ui/button";
 import {ArrowRight, Loader} from "lucide-react";
 import {shippingAddressSchema} from "@/lib/validator";
 import {updateUserAddress} from "@/lib/actions/user.actions";
+import {shippingAddressDefaultValues} from "@/lib/constants";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
 
@@ -22,7 +23,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
 
     const form = useForm<z.infer<typeof shippingAddressSchema>>({
        resolver: zodResolver(shippingAddressSchema),
-       defaultValues: address,
+       defaultValues: address || shippingAddressDefaultValues,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
