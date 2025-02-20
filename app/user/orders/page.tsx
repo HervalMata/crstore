@@ -43,7 +43,7 @@ const OrdersPage = async (props: {
                                 <TableCell>{order.isDelivered && order.deliveredAt ? formatDateTime(order.deliveredAt).dateTime : 'Não Entregue'}</TableCell>
                                 <TableCell>
                                     <Link href={`/order/${order.id}`}>
-                                        <span className='px-2'>Detalhea</span>
+                                        <span className='px-2'>Detalhes</span>
                                     </Link>
                                 </TableCell>
                             </TableRow>
