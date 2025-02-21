@@ -9,6 +9,8 @@ import {ShippingAddress} from "@/types";
 import {z} from "zod";
 import {getMyCart} from "@/lib/actions/cart.actions";
 import { hash } from "../encrypt";
+import {PAGE_SIZE} from "@/lib/constants";
+import {revalidatePath} from "next/cache";
 
 export async function signInWithCredentials(
     prevState: unknown,
@@ -161,6 +163,44 @@ export async function updateProfile(user: { name: string; email: string }) {
         return {
             success: true,
             message: 'Usuário atualizado com sucesso!',
+        };
+    } catch (error) {
+        return { success: false, message: formatError(error) };
+    }
+}
+
+export async function getAllUsers({
+    limit = PAGE_SIZE,
+    page,
+} : {
+    limit?: number;
+    page: number;
+}) {
+    const data = await prisma.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: (page -1) * limit,
+    });
+
+    const dataCount = await prisma.user.count();
+
+    return {
+        data,
+        totalPages: Math.ceil(dataCount / page),
+    };
+}
+
+export async function deleteUser(id: string) {
+    try {
+        await prisma.user.delete({
+            where: { id: id },
+        });
+
+        revalidatePath('/admin/users');
+
+        return {
+            success: true,
+            message: 'Usuário removido com sucesso!',
         };
     } catch (error) {
         return { success: false, message: formatError(error) };
