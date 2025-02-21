@@ -111,4 +111,9 @@ export const paymentResultSchema = z.object({
 export const updateProfileSchema = z.object({
     name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
     email: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
-})
+});
+
+export const updateUserSchema = updateProfileSchema.extend({
+    id: z.string().min(1, 'AID é requerida.'),
+    role: z.string().min(1, 'A Função é requerida.'),
+});
