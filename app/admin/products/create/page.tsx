@@ -12,7 +12,7 @@ const CreateProductPage = () => {
             <h2 className="h2-bold">Cadastrar novo produto</h2>
 
             <div className="my-8">
-                <ProductForm type='Create' product={undefined} productId={""} />
+                <ProductForm type='Create' />
             </div>
         </>
     );
