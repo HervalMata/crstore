@@ -1,4 +1,4 @@
-'use-client';
+'use client';
 
 import {z} from "zod";
 import {updateUserSchema} from "@/lib/validator";
