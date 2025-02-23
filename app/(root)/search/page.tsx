@@ -18,6 +18,32 @@ const SearchPage = async (props: {
         rating = 'all',
         sort = 'newest',
         page = 1  } = await props.searchParams;
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const getFilterUrl = ({
+        c,
+        p,
+        s,
+        r,
+        pg,
+    }: {
+        c?: string;
+        p?: string;
+        s?: string;
+        r?: string;
+        pg?: string;
+    }) => {
+        const params = { q, category, price, rating, sort, page };
+        if (c) params.category = c;
+        if (p) params.price = p;
+        if (s) params.sort = s;
+        if (r) params.rating = r;
+        if (pg) params.page = pg;
+        
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        return `/search?${new URLSearchParams(params).toString()}`;
+    };
 
     
     const products = await getAllProducts({
