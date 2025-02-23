@@ -1,6 +1,7 @@
 import {getAllCategories, getAllProducts} from "@/lib/actions/product.actions";
 import ProductCard from "@/components/shared/product/product-card";
 import Link from "next/link";
+import {Button} from "@/components/ui/button";
 
 const prices = [
     {
@@ -81,6 +82,8 @@ const SearchPage = async (props: {
 
     const categories = await getAllCategories();
 
+    const ratings = [4,3,2,1];
+
     return (
         <div className='grid md:grid-cols-5 md:gap-5'>
             <div className='filter-links'>
@@ -125,8 +128,45 @@ const SearchPage = async (props: {
                         ))}
                     </ul>
                 </div>
+                <div className='text-xl mb-2 mt-3'>Avaliações</div>
+                <div>
+                    <ul className='space-y-1'>
+                        <li>
+                            <Link
+                                className={`${(rating === 'all' || rating === '') && 'font-bold'}}`}
+                                href={getFilterUrl({ r: 'all' })}>
+                                Algum
+                            </Link>
+                        </li>
+                        {ratings.map((r) => (
+                            <li key={r}>
+                                <Link className={`${rating === r.toString() && 'font-bold'}`}
+                                      href={getFilterUrl({ r: `${r}` })}>
+                                    {`${r} estrelas e acima`}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
             <div className='md:col-span-4 space-y-4'>
+                <div className='flex-between flex-col md:flex-row my-4'>
+                    <div className='flex items-center'>
+                        {q !== 'all' && q !== '' && 'Query: ' + q}
+                        {category !== 'all' && category !== '' && ' Categoria: ' + category}
+                        {price !== 'all' && ' Preço: ' + price}
+                        {rating !== 'all' && ' Avaliações: ' + rating + ' estrelas e acima'}
+                        &nbsp;
+                        {(q !== 'all' && q !== '') ||
+                        (category !== 'all' && category !== '') ||
+                         rating !== 'all' ||
+                        price !== 'all' ? (
+                            <Button variant={'link'} asChild>
+                                <Link href='/search'>Limpar</Link>
+                            </Button>
+                        ) : null}
+                    </div>
+                </div>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                     {products.data.length === 0 && <div>Nenhum Produto</div>}
                     {products.data.map(product => (
