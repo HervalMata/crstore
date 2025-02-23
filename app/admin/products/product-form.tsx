@@ -222,13 +222,7 @@ const ProductForm = ({
                     <FormField
                         control={form.control}
                         name='images'
-                        render={({
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                            field,
-                                 }: {
-                            field: ControllerRenderProps<z.infer<typeof insertProductSchema>,
-                                'images'>;
-                        }) => (
+                        render={() => (
                             <FormItem className='w-full'>
                                 <FormLabel>Imagens</FormLabel>
                                 <Card>
