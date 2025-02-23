@@ -18,8 +18,8 @@ const ShippingAddressPage = async () => {
 
   const session = await auth();
   const userId = session?.user?.id;
-
-  if (!userId) throw  new Error("Nenhum Usuário encontrado com este ID");
+    console.log(userId);
+  if (!userId) throw new Error("Nenhum Usuário encontrado com este ID");
 
   const user = await getUserById(userId);
 

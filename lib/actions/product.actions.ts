@@ -31,12 +31,15 @@ export async function getAllProducts({
     limit = PAGE_SIZE,
     page,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    category,
+    category, price, rating, sort,
 } : {
     query: string;
     limit?: number;
     page: number;
     category?: string;
+    price?: number;
+    rating?: number;
+    sort?: string;
 }) {
     const data = await prisma.product.findMany({
         orderBy: { createdAt: 'desc' },
