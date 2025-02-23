@@ -40,7 +40,8 @@ export async function createUpdateReview(
                     },
                 });
             } else {
-                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 await tx.review.create({ data: review });
             }
 
@@ -70,4 +71,32 @@ export async function createUpdateReview(
     } catch (error) {
         return { success: false, message: formatError(error)};
     }
+}
+
+export async function getReviews({ productId}: { productId: string }) {
+    const data = await prisma.review.findMany({
+        where: { productId: productId },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                },
+            },
+        },
+        orderBy: { createdAt:  "desc"},
+    });
+    
+    return data;
+}
+
+export async function getReviewByProductId({ productId }: { productId: string }) {
+    const session = await auth();
+    if (!session) throw new Error('Usuário não autorizado.');
+
+    return await prisma.review.findFirst({
+        where: {
+            productId,
+            userId: session?.user?.id,
+        },
+    });
 }

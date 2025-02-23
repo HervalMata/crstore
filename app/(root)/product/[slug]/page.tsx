@@ -7,14 +7,20 @@ import {Badge} from "@/components/ui/badge";
 import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import {getMyCart} from "@/lib/actions/cart.actions";
+import Rating from "@/components/shared/product/rating";
+import ReviewList from "@/app/(root)/product/[slug]/review-list";
+import {auth} from "@/auth";
 
 const ProductDetailsPage = async (props: {
     params: Promise<{ slug: string  }>;
 }) => {
     const { slug } = await props.params;
-    const product = await getProductBySlug(slug);
 
+    const product = await getProductBySlug(slug);
     if (!product) notFound();
+
+    const session = await auth();
+    const userId = session?.user?.id;
 
     const cart = await getMyCart();
 
@@ -31,9 +37,9 @@ const ProductDetailsPage = async (props: {
                                 {product.brand} {product.category}
                             </p>
                             <h1 className='h3-bold'>{product.name}</h1>
+                            <Rating value={Number(product.rating)} />
                             <p>
-                                {product.rating} de {product.numReviews}
-                                Avaliações
+                                {product.numReviews} Avaliações
                             </p>
                             <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
                                 <ProductPrice value={Number(product.price)} className='w-24 rounded-full bg-green-100 text-green-700 px-5 py-2' />
@@ -80,6 +86,14 @@ const ProductDetailsPage = async (props: {
                         </Card>
                     </div>
                 </div>
+            </section>
+            <section className="mt-10">
+                <h2 className='h2-bold mb-5'>Avaliações dos Usuários</h2>
+                <ReviewList
+                    userId={userId || ''}
+                    productId={product.id}
+                    productSlug={product.slug}
+                />
             </section>
         </>
     );
