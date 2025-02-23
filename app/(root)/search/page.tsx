@@ -23,9 +23,8 @@ const SearchPage = async (props: {
     const products = await getAllProducts({
         query: q,
         category,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        price, rating,
+        price,
+        rating,
         sort,
         page: Number(page),
     });

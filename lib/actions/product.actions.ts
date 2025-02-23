@@ -6,6 +6,7 @@ import {LATEST_PRODUCTS_LIMIT, PAGE_SIZE} from "@/lib/constants";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import {insertProductSchema, updateProductSchema} from "@/lib/validator";
+import {Prisma} from "@prisma/client";
 
 export async function getLatestProducts() {
 
@@ -26,23 +27,62 @@ export async function getProductBySlug(slug: string) {
 }
 
 export async function getAllProducts({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query,
     limit = PAGE_SIZE,
     page,
+    category,
+    price,
+    rating,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    category, price, rating, sort,
+    sort,
 } : {
     query: string;
     limit?: number;
     page: number;
     category?: string;
-    price?: number;
-    rating?: number;
+    price?: string;
+    rating?: string;
     sort?: string;
 }) {
+    const queryFilter: Prisma.ProductWhereInput =
+        query && query !== 'all'
+            ? {
+                name: {
+                    contains: query,
+                    mode: 'insensitive',
+                } as Prisma.StringFilter,
+            }
+            : {};
+
+    const categoryFilter = category && category !== 'all' ? { category } : {};
+
+    const priceFilter: Prisma.ProductWhereInput =
+        price && price !== 'all'
+            ? {
+                price: {
+                    gte: Number(price.split('-')[0]),
+                    lte: Number(price.split('-')[1]),
+                },
+            }
+            : {};
+
+    const ratingFilter =
+        rating && rating !== 'all'
+            ? {
+                rating: {
+                    gte: Number(rating),
+                },
+            }
+            : {};
+
     const data = await prisma.product.findMany({
         orderBy: { createdAt: 'desc' },
+        where: {
+            ...queryFilter,
+            ...categoryFilter,
+            ...priceFilter,
+            ...ratingFilter,
+        },
         skip: (page - 1) * limit,
         take: limit,
     });
