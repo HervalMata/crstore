@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import {useToast} from "@/hooks/use-toast";
-import {useForm} from "react-hook-form";
+import {SubmitHandler, useForm} from "react-hook-form";
 import {z} from "zod";
 import {insertReviewSchema} from "@/lib/validator";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -21,23 +21,21 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {StarIcon} from "lucide-react";
+import {createUpdateReview} from "@/lib/actions/review.actions";
 
 const ReviewForm = (
     {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         userId,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         productId,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onReviewSubmitted,
     }: {
         userId: string;
         productId: string;
-        onReviewSubmitted?: () => void;
+        onReviewSubmitted: () => void;
     }
 ) => {
     const [open, setOpen] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof insertReviewSchema>>({
@@ -46,8 +44,29 @@ const ReviewForm = (
     });
 
     const handleOpenForm = () => {
+        form.setValue('productId', productId);
+        form.setValue('userId', userId);
         setOpen(true);
     };
+
+    const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (values) => {
+        const res = await createUpdateReview({ ...values, productId });
+
+        if (!res.success) {
+            return toast({
+                variant: 'destructive',
+                description: res.message,
+            });
+        }
+
+        setOpen(false);
+
+        onReviewSubmitted();
+
+        toast({
+            description: res.message,
+        });
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -56,7 +75,7 @@ const ReviewForm = (
             </Button>
             <DialogContent className='sm:max-w-[425px]'>
                 <Form {...form}>
-                    <form method='POST'>
+                    <form method='POST' onSubmit={form.handleSubmit(onSubmit)}>
                         <DialogHeader>
                             <DialogTitle>Escreva uma avaliação</DialogTitle>
                             <DialogDescription>
