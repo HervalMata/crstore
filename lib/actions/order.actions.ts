@@ -7,11 +7,12 @@ import {getMyCart} from "@/lib/actions/cart.actions";
 import {getUserById} from "@/lib/actions/user.actions";
 import {insertOrderSchema} from "@/lib/validator";
 import {prisma} from "@/db/prisma";
-import {CartItem, PaymentResult} from "@/types";
+import {CartItem, PaymentResult, ShippingAddress} from "@/types";
 import {paypal} from "@/lib/paypal";
 import {revalidatePath} from "next/cache";
 import {PAGE_SIZE} from "@/lib/constants";
 import {Prisma} from "@prisma/client";
+import {sendPurchaseReceipt} from "@/email";
 
 export const createOrder = async () => {
     try {
@@ -257,6 +258,14 @@ export async function updateOrderToPaid({
     if (!updatedOrder) {
         throw new Error('Ordem não encontrada.');
     }
+
+    await sendPurchaseReceipt({
+        order: {
+            ...updatedOrder,
+            shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+            paymentResult: updatedOrder.paymentResult as PaymentResult,
+        },
+    });
 }
 
 export async function getMyOrders({
