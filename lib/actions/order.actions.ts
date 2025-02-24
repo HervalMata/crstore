@@ -339,11 +339,29 @@ export async function getOrderSummary() {
 export async function getAllOrders({
     limit = PAGE_SIZE,
     page,
+    query,
 } : {
     limit?: number;
     page: number;
+    query: string;
 }) {
+    const queryFilter: Prisma.UserWhereInput =
+        query && query !== 'all'
+            ? {
+                name: {
+                    contains: query,
+                    mode: 'insensitive',
+                } as Prisma.StringFilter,
+            }
+            : {};
+    
+    
     const data = await prisma.order.findMany({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        where: {
+            ...queryFilter,
+        },
         orderBy: { createdAt: 'desc' },
         take: limit,
         skip: (page - 1) * limit,
