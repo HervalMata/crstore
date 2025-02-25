@@ -1,7 +1,11 @@
+'use client';
+
 import {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+
+const TARGET_DATE = new Date('2025-11-20T00:00:00');
 
 const calculateTimeRemaining = (targetDate: Date) => {
     const currentTime = new Date();
@@ -16,18 +20,13 @@ const calculateTimeRemaining = (targetDate: Date) => {
 };
 
 const DealCountdown = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [targetDate, setTargetDate] = useState(() => {
-        const date = new Date();
-        date.setDate(date.getDate() + 3);
-        return date;
-    });
-
-    const [time, setTime] = useState(() => calculateTimeRemaining(targetDate));
+    const [time, setTime] = useState<ReturnType<typeof calculateTimeRemaining>>();
 
     useEffect(() => {
+        setTime(calculateTimeRemaining(TARGET_DATE));
+
         const timeInterval = setInterval(() => {
-            const newTime = calculateTimeRemaining(targetDate);
+            const newTime = calculateTimeRemaining(TARGET_DATE);
             setTime(newTime);
 
             if (
@@ -41,7 +40,48 @@ const DealCountdown = () => {
         }, 1000);
 
         return () => clearInterval(timeInterval);
-    }, [targetDate]);
+    }, []);
+
+    if (!time) {
+        return (
+            <section className='grid grid-cols-1 md:grid-cols-2 my-20'>
+                <div className='flex flex-col gap-2 justify-center'>
+                    <h3 className='text-3xl font-bold'>Carregando contador...</h3>
+                </div>
+            </section>
+        );
+    }
+
+    if (
+        time.days === 0 &&
+        time.hours === 0 &&
+        time.minutes === 0 &&
+        time.seconds === 0
+    ) {
+        return (
+            <section className='grid grid-cols-1 md:grid-cols-2 my-20'>
+                <div className='flex flex-col gap-2 justify-center'>
+                    <h3 className='text-3xl font-bold'>Ofertas encerradas</h3>
+                    <p>
+                        Esta oferta não está mais dísponível.Check nossas outras promoções!
+                    </p>
+                    <div className='text-center'>
+                        <Button asChild>
+                            <Link href='/search'>Veja Produtos</Link>
+                        </Button>
+                    </div>
+                    <div className='flex justify-center'>
+                        <Image
+                            src='/images/promo.jpg'
+                            alt='promoção'
+                            width={300}
+                            height={200}
+                        />
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className='grid grid-cols-1 md:grid-cols-2 my-20'>
