@@ -1,3 +1,5 @@
+'use server';
+
 import {z} from "zod";
 import {insertReviewSchema} from "@/lib/validator";
 import {auth} from "@/auth";
