@@ -24,7 +24,7 @@ const OrderDetailsPage = async (
 
   const session = await auth();
 
-  if (order.userId !== session?.user?.id) {
+  if (order.userId !== session?.user?.id && session?.user?.role !== 'admin') {
     return redirect('/unauthorized');
   }
   
