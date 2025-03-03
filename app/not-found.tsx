@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {APP_NAME} from "@/lib/constants";
 import {Button} from "@/components/ui/button";
+import Link from 'next/link';
 
 const NotFound = () => {
    return (
@@ -20,9 +21,9 @@ const NotFound = () => {
                <Button
                 variant='outline'
                 className='mt-4 ml-2'
-                onClick={() => {window.location.href = '/'}}
+                asChild
                >
-                   Retornar para Home
+                 <Link href='/'>Retornar para Home</Link>
                </Button>
            </div>
        </div>
