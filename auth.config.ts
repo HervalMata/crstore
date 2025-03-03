@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {NextAuthConfig} from "next-auth";
+import type {NextAuthConfig} from "next-auth";
 
 export const authConfig = {
     providers: [],
