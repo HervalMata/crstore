@@ -23,6 +23,10 @@ const OrderDetailsPage = async (
   if (!order) notFound();
 
   const session = await auth();
+
+  if (order.userId !== session?.user?.id) {
+    return redirect('/unauthorized');
+  }
   
   let client_secret = null;
   

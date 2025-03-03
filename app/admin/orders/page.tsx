@@ -4,9 +4,9 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import {formatCurrency, formatDateTime, formatId} from "@/lib/utils";
 import Link from "next/link";
 import Pagination from "@/components/shared/pagination";
-import {auth} from "@/auth";
 import {Button} from "@/components/ui/button";
 import DeleteDialog from "@/components/shared/delete-dialog";
+import { requireAdmin } from '@/lib/auth-guard';
 
 export const metadata: Metadata = {
     title: "Ordens",
@@ -16,11 +16,7 @@ const AdminOrdersPage = async (props: {
     searchParams: Promise<{ page: string; query: string }>
 }) => {
     const { page = '1', query: searchText } = await props.searchParams;
-    const session = await auth();
-
-    if (session?.user?.role !== "admin") {
-        throw new Error("Usuário não encontrado");
-    }
+    await requireAdmin();
 
     const orders = await getAllOrders({
         page: Number(page), query: searchText,
