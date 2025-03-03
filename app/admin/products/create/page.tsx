@@ -1,11 +1,13 @@
 import {Metadata} from "next";
 import ProductForm from "@/app/admin/products/product-form";
+import { requireAdmin } from '@/lib/auth-guard';
 
 export const metadata: Metadata = {
     title: "Cadastro de Produtos",
 }
 
-const CreateProductPage = () => {
+const CreateProductPage = async () => {
+    await requireAdmin();
 
     return (
         <>
