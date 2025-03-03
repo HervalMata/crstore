@@ -63,6 +63,8 @@ function RemoveButton(
         type='button'
         onClick={() =>
           startTransition(async () => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
               const res = await removeItemFromCart(item);
 
               if (!res.success) {
@@ -85,7 +87,6 @@ function RemoveButton(
 
 const CartTable = ({ cart }: { cart?: Cart}) => {
     const router = useRouter();
-    const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
 
     return (
